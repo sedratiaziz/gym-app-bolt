@@ -1,147 +1,83 @@
-import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { Calendar, TrendingUp, Clock, Plus, Dumbbell } from 'lucide-react-native';
-import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
-import { formatDate } from '@/utils/dateUtils';
+import { Plus } from 'lucide-react-native';
 
-export default function Dashboard() {
-  const router = useRouter();
-  const { getRecentWorkouts, getWeeklyStats } = useWorkoutHistory();
-  const [recentWorkouts, setRecentWorkouts] = useState([]);
-  const [weeklyStats, setWeeklyStats] = useState({ workouts: 0, duration: 0 });
-  const [currentDate, setCurrentDate] = useState(new Date());
+const todaysWorkouts = [
+  {
+    id: 1,
+    name: 'Strength Training',
+    reps: 12,
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
+  },
+  {
+    id: 2,
+    name: 'Strength Training',
+    reps: 10,
+    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+  },
+  {
+    id: 3,
+    name: 'Strength Training',
+    reps: 15,
+    image: 'https://images.pexels.com/photos/3823173/pexels-photo-3823173.jpeg',
+  },
+];
 
-  useEffect(() => {
-    setRecentWorkouts(getRecentWorkouts(3));
-    setWeeklyStats(getWeeklyStats());
-  }, []);
+const yesterdaysWorkouts = [
+  {
+    id: 4,
+    name: 'Strength Training',
+    reps: 12,
+    image: 'https://images.pexels.com/photos/2261482/pexels-photo-2261482.jpeg',
+  },
+  {
+    id: 5,
+    name: 'Strength Training',
+    reps: 10,
+    image: 'https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg',
+  },
+  {
+    id: 6,
+    name: 'Strength Training',
+    reps: 15,
+    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+  },
+];
 
+export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.topBar}>
+        <View style={styles.topBarLeft}>
+          <View style={styles.fbIcon} />
+        </View>
+        <Text style={styles.appTitle}>Dumbbell Plus</Text>
+        <TouchableOpacity style={styles.plusButton}>
+          <Plus size={28} color="#fff" />
+        </TouchableOpacity>
+      </View>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.greeting}>Hi there,</Text>
-          <Text style={styles.title}>Ready for your workout?</Text>
-        </View>
-
-        <View style={styles.dateContainer}>
-          <Calendar size={20} color="#0066FF" />
-          <Text style={styles.date}>{formatDate(currentDate)}</Text>
-        </View>
-
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <View style={styles.statIconContainer}>
-              <Dumbbell size={24} color="#FFFFFF" />
+        <Text style={styles.sectionHeader}>Today's Workouts</Text>
+        <View style={styles.workoutGrid}>
+          {todaysWorkouts.map((w) => (
+            <View key={w.id} style={styles.workoutCard}>
+              <Image source={{ uri: w.image }} style={styles.workoutImage} />
+              <Text style={styles.workoutName}>{w.name}</Text>
+              <Text style={styles.workoutReps}>{w.reps} reps</Text>
             </View>
-            <View style={styles.statContent}>
-              <Text style={styles.statValue}>{weeklyStats.workouts}</Text>
-              <Text style={styles.statLabel}>Workouts this week</Text>
+          ))}
+        </View>
+        <Text style={styles.sectionHeader}>Tomorrow's Workouts</Text>
+        <View style={styles.workoutGrid}>
+          {yesterdaysWorkouts.map((w) => (
+            <View key={w.id} style={styles.workoutCard}>
+              <Image source={{ uri: w.image }} style={styles.workoutImage} />
+              <Text style={styles.workoutName}>{w.name}</Text>
+              <Text style={styles.workoutReps}>{w.reps} reps</Text>
             </View>
-          </View>
-          <View style={styles.statCard}>
-            <View style={[styles.statIconContainer, { backgroundColor: '#00D1C1' }]}>
-              <Clock size={24} color="#FFFFFF" />
-            </View>
-            <View style={styles.statContent}>
-              <Text style={styles.statValue}>{weeklyStats.duration}</Text>
-              <Text style={styles.statLabel}>Hours this week</Text>
-            </View>
-          </View>
+          ))}
         </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Workouts</Text>
-          <TouchableOpacity onPress={() => router.push('/workouts')}>
-            <Text style={styles.sectionLink}>See All</Text>
-          </TouchableOpacity>
-        </View>
-
-        {recentWorkouts.length > 0 ? (
-          recentWorkouts.map((workout, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.workoutCard}
-              onPress={() => router.push(`/workouts/${workout.id}`)}
-            >
-              <View style={styles.workoutCardLeft}>
-                <Text style={styles.workoutName}>{workout.name}</Text>
-                <Text style={styles.workoutMeta}>
-                  {workout.exercises.length} exercises • {workout.duration} min
-                </Text>
-              </View>
-              <View style={styles.workoutCardRight}>
-                <Text style={styles.workoutDate}>{formatDate(new Date(workout.date), 'short')}</Text>
-                <TrendingUp size={16} color="#0066FF" />
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No recent workouts</Text>
-            <TouchableOpacity 
-              style={styles.startWorkoutButton}
-              onPress={() => router.push('/workouts/create')}
-            >
-              <Text style={styles.startWorkoutButtonText}>Start your first workout</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Quick Start</Text>
-        </View>
-
-        <View style={styles.quickStartContainer}>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.quickStartScrollContent}
-          >
-            <TouchableOpacity 
-              style={styles.quickStartCard}
-              onPress={() => router.push('/workouts/templates')}
-            >
-              <Image 
-                source={{ uri: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg' }} 
-                style={styles.quickStartImage}
-              />
-              <Text style={styles.quickStartName}>Upper Body</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.quickStartCard}
-              onPress={() => router.push('/workouts/templates')}
-            >
-              <Image 
-                source={{ uri: 'https://images.pexels.com/photos/4761767/pexels-photo-4761767.jpeg' }} 
-                style={styles.quickStartImage}
-              />
-              <Text style={styles.quickStartName}>Lower Body</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.quickStartCard}
-              onPress={() => router.push('/workouts/templates')}
-            >
-              <Image 
-                source={{ uri: 'https://images.pexels.com/photos/3823173/pexels-photo-3823173.jpeg' }} 
-                style={styles.quickStartImage}
-              />
-              <Text style={styles.quickStartName}>Cardio</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.quickStartCard, styles.createTemplateCard]}
-              onPress={() => router.push('/workouts/create')}
-            >
-              <View style={styles.createTemplateIconContainer}>
-                <Plus size={24} color="#0066FF" />
-              </View>
-              <Text style={styles.createTemplateName}>Create New</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </ScrollView>
+      </ScrollView>     
     </SafeAreaView>
   );
 }
@@ -149,201 +85,122 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#12221C',
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 18,
+  },
+  topBarLeft: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fbIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#22332B',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  appTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  plusButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16,
+    backgroundColor: 'transparent',
   },
   scrollView: {
     flex: 1,
-    padding: 16,
-  },
-  header: {
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  greeting: {
-    fontSize: 16,
-    color: '#8E8E93',
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#000000',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  date: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#0066FF',
-    marginLeft: 8,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    marginBottom: 24,
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  statIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#0066FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  statContent: {
-    justifyContent: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: 2,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#8E8E93',
+    paddingHorizontal: 16,
   },
   sectionHeader: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 18,
+    marginBottom: 10,
+  },
+  workoutGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#000000',
-  },
-  sectionLink: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#0066FF',
+    marginBottom: 10,
   },
   workoutCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    width: '48%',
+    backgroundColor: '#1B2A23',
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
-  workoutCardLeft: {
-    flex: 3,
-  },
-  workoutCardRight: {
-    flex: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
+  workoutImage: {
+    width: '100%',
+    height: 90,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   workoutName: {
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
+    marginTop: 10,
+    marginLeft: 12,
   },
-  workoutMeta: {
-    fontSize: 14,
-    color: '#8E8E93',
+  workoutReps: {
+    color: '#6FCF97',
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 12,
+    marginLeft: 12,
   },
-  workoutDate: {
-    fontSize: 12,
-    color: '#8E8E93',
-    marginBottom: 4,
-  },
-  emptyState: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 24,
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    backgroundColor: '#12221C',
+    borderTopWidth: 1,
+    borderTopColor: '#22332B',
+    height: 70,
   },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#8E8E93',
-    marginBottom: 16,
-  },
-  startWorkoutButton: {
-    backgroundColor: '#0066FF',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  startWorkoutButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  quickStartContainer: {
-    marginBottom: 24,
-  },
-  quickStartScrollContent: {
-    paddingRight: 16,
-  },
-  quickStartCard: {
-    width: 140,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginRight: 12,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  quickStartImage: {
-    width: '100%',
-    height: 100,
-  },
-  quickStartName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#000000',
-    padding: 12,
-  },
-  createTemplateCard: {
+  navItem: {
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    height: 143,
+    flex: 1,
   },
-  createTemplateIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#F0F8FF',
+  navItemActive: {
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
+    flex: 1,
   },
-  createTemplateName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0066FF',
+  navIcon: {
+    width: 28,
+    height: 28,
+    marginBottom: 2,
+    tintColor: '#6FCF97',
+  },
+  navLabel: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '500',
+    opacity: 0.7,
+  },
+  navLabelActive: {
+    color: '#6FCF97',
+    fontSize: 13,
+    fontWeight: '700',
   },
 });
