@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 const todaysWorkouts = [
   {
@@ -13,13 +14,13 @@ const todaysWorkouts = [
     id: 2,
     name: 'Strength Training',
     reps: 10,
-    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
   {
     id: 3,
     name: 'Strength Training',
     reps: 15,
-    image: 'https://images.pexels.com/photos/3823173/pexels-photo-3823173.jpeg',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
 ];
 
@@ -28,19 +29,19 @@ const yesterdaysWorkouts = [
     id: 4,
     name: 'Strength Training',
     reps: 12,
-    image: 'https://images.pexels.com/photos/2261482/pexels-photo-2261482.jpeg',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
   {
     id: 5,
     name: 'Strength Training',
     reps: 10,
-    image: 'https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
   {
     id: 6,
     name: 'Strength Training',
     reps: 15,
-    image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg',
+    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
 ];
 
@@ -59,22 +60,25 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <Text style={styles.sectionHeader}>Today's Workouts</Text>
         <View style={styles.workoutGrid}>
+            {/* style={styles.workoutRow}
+            onPress={() => router.push(`/workouts/details?id=${item.id}` as any)}
+            */}
           {todaysWorkouts.map((w) => (
-            <View key={w.id} style={styles.workoutCard}>
+            <TouchableOpacity onPress={()=>{router.push(`/workouts/details?id=${w.id}` as any)}} key={w.id} style={styles.workoutCard}>
               <Image source={{ uri: w.image }} style={styles.workoutImage} />
               <Text style={styles.workoutName}>{w.name}</Text>
               <Text style={styles.workoutReps}>{w.reps} reps</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
         <Text style={styles.sectionHeader}>Tomorrow's Workouts</Text>
         <View style={styles.workoutGrid}>
           {yesterdaysWorkouts.map((w) => (
-            <View key={w.id} style={styles.workoutCard}>
+            <TouchableOpacity onPress={()=>{router.push(`/workouts/details?id=${w.id}` as any)}} key={w.id} style={styles.workoutCard}>
               <Image source={{ uri: w.image }} style={styles.workoutImage} />
               <Text style={styles.workoutName}>{w.name}</Text>
               <Text style={styles.workoutReps}>{w.reps} reps</Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>     

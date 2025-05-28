@@ -1,117 +1,60 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { Settings, Bell, Share2, CircleHelp as HelpCircle, LogOut, ChevronRight } from 'lucide-react-native';
+import { Settings, User, Bell, HelpCircle } from 'lucide-react-native';
 
 export default function ProfileScreen() {
-  const router = useRouter();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-  const [metricUnits, setMetricUnits] = useState(true);
-
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top']}>  
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
         <TouchableOpacity style={styles.settingsButton}>
-          <Settings size={24} color="#0066FF" />
+          <Settings size={28} color="#F8F8F8" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.profileSection}>
-          <Image 
-            source={{ uri: 'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg' }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.profileName}>Alex Johnson</Text>
-          <Text style={styles.profileStats}>12 Workouts • 3.5 kg lost</Text>
-          <TouchableOpacity style={styles.editProfileButton}>
-            <Text style={styles.editProfileText}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.profileSection}>
+        <Image
+          source={{ uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.profileName}>Ethan Carter</Text>
+        <Text style={styles.profileSubtitle}>Member since 2022</Text>
+      </View>
 
-        <View style={styles.sectionTitle}>
-          <Text style={styles.sectionTitleText}>App Settings</Text>
-        </View>
+      <Text style={styles.accountTitle}>Account</Text>
 
-        <View style={styles.settingsSection}>
-          <View style={styles.settingItem}>
-            <View style={styles.settingLabelContainer}>
-              <Bell size={20} color="#0066FF" />
-              <Text style={styles.settingLabel}>Notifications</Text>
-            </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: '#E5E5EA', true: '#0066FF' }}
-              thumbColor={'#FFFFFF'}
-            />
+      <View style={styles.accountSection}>
+        <TouchableOpacity style={styles.accountRow}>
+          <View style={styles.iconContainer}>
+            <User size={28} color="#F8F8F8" />
           </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLabelContainer}>
-              <Moon size={20} color="#8E8E93" />
-              <Text style={styles.settingLabel}>Dark Mode</Text>
-            </View>
-            <Switch
-              value={darkModeEnabled}
-              onValueChange={setDarkModeEnabled}
-              trackColor={{ false: '#E5E5EA', true: '#0066FF' }}
-              thumbColor={'#FFFFFF'}
-            />
+          <Text style={styles.accountLabel}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.accountRow}>
+          <View style={styles.iconContainer}>
+            <Bell size={28} color="#F8F8F8" />
           </View>
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLabelContainer}>
-              <Weight size={20} color="#8E8E93" />
-              <Text style={styles.settingLabel}>Use Metric Units</Text>
-            </View>
-            <Switch
-              value={metricUnits}
-              onValueChange={setMetricUnits}
-              trackColor={{ false: '#E5E5EA', true: '#0066FF' }}
-              thumbColor={'#FFFFFF'}
-            />
+          <Text style={styles.accountLabel}>Notifications</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.accountRow}>
+          <View style={styles.iconContainer}>
+            <Settings size={28} color="#F8F8F8" />
           </View>
-        </View>
+          <Text style={styles.accountLabel}>Settings</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.accountRow}>
+          <View style={styles.iconContainer}>
+            <HelpCircle size={28} color="#F8F8F8" />
+          </View>
+          <Text style={styles.accountLabel}>Help</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.sectionTitle}>
-          <Text style={styles.sectionTitleText}>Other</Text>
-        </View>
-
-        <View style={styles.settingsSection}>
-          <TouchableOpacity style={styles.settingButton}>
-            <View style={styles.settingLabelContainer}>
-              <Share2 size={20} color="#8E8E93" />
-              <Text style={styles.settingLabel}>Share App</Text>
-            </View>
-            <ChevronRight size={20} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingButton}>
-            <View style={styles.settingLabelContainer}>
-              <HelpCircle size={20} color="#8E8E93" />
-              <Text style={styles.settingLabel}>Help & Support</Text>
-            </View>
-            <ChevronRight size={20} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.settingButton}>
-            <View style={styles.settingLabelContainer}>
-              <LogOut size={20} color="#FF3B30" />
-              <Text style={[styles.settingLabel, { color: '#FF3B30' }]}>
-                Log Out
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Version 1.0.0</Text>
-        </View>
-      </ScrollView>
+      <View style={styles.logoutContainer}>
+        <TouchableOpacity style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -119,152 +62,100 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#14241C',
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    justifyContent: 'center',
+    paddingTop: 32,
+    paddingBottom: 16,
+    position: 'relative',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
-    color: '#000000',
+    color: '#F8F8F8',
+    textAlign: 'center',
+    flex: 1,
   },
   settingsButton: {
-    padding: 8,
-  },
-  content: {
-    flex: 1,
+    position: 'absolute',
+    right: 24,
+    top: 32,
+    padding: 4,
   },
   profileSection: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 24,
-    marginHorizontal: 16,
-    marginBottom: 24,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    marginTop: 8,
+    marginBottom: 32,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: '#EAD9C7',
     marginBottom: 16,
   },
   profileName: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#000000',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#F8F8F8',
     marginBottom: 4,
   },
-  profileStats: {
-    fontSize: 14,
-    color: '#8E8E93',
-    marginBottom: 16,
-  },
-  editProfileButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#0066FF',
-  },
-  editProfileText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#0066FF',
-  },
-  sectionTitle: {
-    paddingHorizontal: 16,
+  profileSubtitle: {
+    fontSize: 20,
+    color: '#7FC1A4',
     marginBottom: 8,
   },
-  sectionTitleText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#8E8E93',
+  accountTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#F8F8F8',
+    marginLeft: 32,
+    marginBottom: 16,
   },
-  settingsSection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginBottom: 24,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFEFEF',
-  },
-  settingButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFEFEF',
-  },
-  settingLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000000',
-    marginLeft: 12,
-  },
-  versionContainer: {
-    alignItems: 'center',
+  accountSection: {
+    marginHorizontal: 0,
     marginBottom: 32,
   },
-  versionText: {
-    fontSize: 14,
-    color: '#8E8E93',
+  accountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 32,
+    marginBottom: 20,
+  },
+  iconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: '#223D33',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 20,
+  },
+  accountLabel: {
+    fontSize: 22,
+    color: '#F8F8F8',
+    fontWeight: '400',
+  },
+  logoutContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  logoutButton: {
+    width: '90%',
+    backgroundColor: '#223D33',
+    borderRadius: 32,
+    paddingVertical: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutText: {
+    color: '#F8F8F8',
+    fontSize: 22,
+    fontWeight: '700',
   },
 });
-
-// Missing icon components
-const Moon = ({ size, color }) => {
-  return (
-    <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ width: size * 0.8, height: size * 0.8, borderRadius: size, backgroundColor: 'transparent', borderWidth: 2, borderColor: color }} />
-      <View style={{ position: 'absolute', width: size * 0.5, height: size * 0.5, borderRadius: size, backgroundColor: color, top: size * 0.15, right: size * 0.15 }} />
-    </View>
-  );
-};
-
-const Weight = ({ size, color }) => {
-  return (
-    <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ width: size * 0.7, height: size * 0.15, backgroundColor: color, borderRadius: size * 0.05 }} />
-      <View style={{ position: 'absolute', width: size * 0.2, height: size * 0.6, backgroundColor: color, left: size * 0.1, borderRadius: size * 0.05 }} />
-      <View style={{ position: 'absolute', width: size * 0.2, height: size * 0.6, backgroundColor: color, right: size * 0.1, borderRadius: size * 0.05 }} />
-    </View>
-  );
-};
-
-const Dumbbell = ({ size, color }) => {
-  return (
-    <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
-      <View style={{ width: size * 0.7, height: size * 0.15, backgroundColor: color, borderRadius: size * 0.05 }} />
-      <View style={{ position: 'absolute', width: size * 0.25, height: size * 0.5, backgroundColor: color, left: 0, borderRadius: size * 0.05 }} />
-      <View style={{ position: 'absolute', width: size * 0.25, height: size * 0.5, backgroundColor: color, right: 0, borderRadius: size * 0.05 }} />
-    </View>
-  );
-};

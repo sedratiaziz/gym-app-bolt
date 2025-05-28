@@ -1,9 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter, usePathname, Slot } from 'expo-router';
+import { Home, Dumbbell, LineChart, User } from 'lucide-react-native';
 
 export default function TabLayout() {
   const router = useRouter();
   const pathname = usePathname();
+
+  const activeColor = '#6FCF97';
+  const inactiveColor = '#fff';
+  const inactiveOpacity = 0.7;
 
   return (
     <View style={{ flex: 1, backgroundColor: '#12221C' }}>
@@ -15,28 +20,28 @@ export default function TabLayout() {
           style={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? styles.navItemActive : styles.navItem}
           onPress={() => router.push('/(tabs)')}
         >
-          <Image source={require('../../assets/images/icon.png')} style={styles.navIcon} />
+          <Home size={28} color={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? activeColor : inactiveColor} opacity={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? 1 : inactiveOpacity} />
           <Text style={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? styles.navLabelActive : styles.navLabel}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={pathname.startsWith('/(tabs)/workouts') ? styles.navItemActive : styles.navItem}
           onPress={() => router.push('/(tabs)/workouts')}
         >
-          <Image source={require('../../assets/images/icon.png')} style={styles.navIcon} />
+          <Dumbbell size={28} color={pathname.startsWith('/(tabs)/workouts') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/workouts') ? 1 : inactiveOpacity} />
           <Text style={pathname.startsWith('/(tabs)/workouts') ? styles.navLabelActive : styles.navLabel}>Workouts</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={pathname.startsWith('/(tabs)/progress') ? styles.navItemActive : styles.navItem}
           onPress={() => router.push('/(tabs)/progress')}
         >
-          <Image source={require('../../assets/images/icon.png')} style={styles.navIcon} />
+          <LineChart size={28} color={pathname.startsWith('/(tabs)/progress') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/progress') ? 1 : inactiveOpacity} />
           <Text style={pathname.startsWith('/(tabs)/progress') ? styles.navLabelActive : styles.navLabel}>Progress</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={pathname.startsWith('/(tabs)/profile') ? styles.navItemActive : styles.navItem}
           onPress={() => router.push('/(tabs)/profile')}
         >
-          <Image source={require('../../assets/images/icon.png')} style={styles.navIcon} />
+          <User size={28} color={pathname.startsWith('/(tabs)/profile') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/profile') ? 1 : inactiveOpacity} />
           <Text style={pathname.startsWith('/(tabs)/profile') ? styles.navLabelActive : styles.navLabel}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -63,12 +68,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-  },
-  navIcon: {
-    width: 28,
-    height: 28,
-    marginBottom: 2,
-    tintColor: '#6FCF97',
   },
   navLabel: {
     color: '#fff',
