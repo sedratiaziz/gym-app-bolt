@@ -16,7 +16,7 @@ export default function CreateWorkoutScreen() {
   };
 
   const handleSaveWorkout = () => {
-    // Save logic here
+    router.push('/(tabs)');
   };
 
   return (

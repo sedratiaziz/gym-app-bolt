@@ -53,7 +53,7 @@ export default function HomeScreen() {
           <View style={styles.fbIcon} />
         </View>
         <Text style={styles.appTitle}>Dumbbell Plus</Text>
-        <TouchableOpacity style={styles.plusButton}>
+        <TouchableOpacity style={styles.plusButton} onPress={() => router.push('/workouts/create')}>
           <Plus size={28} color="#fff" />
         </TouchableOpacity>
       </View>

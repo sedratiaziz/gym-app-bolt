@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Pencil } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -18,6 +18,26 @@ const mockExercise = {
 
 export default function EditWorkout() {
   const router = useRouter();
+  const [showSetEdit, setShowSetEdit] = useState(false);
+  const [editSetIndex, setEditSetIndex] = useState<number | null>(null);
+  const [reps, setReps] = useState('');
+  const [weight, setWeight] = useState('');
+
+  const handlePencilPress = (index: number) => {
+    setEditSetIndex(index);
+    setReps(mockExercise.setDetails[index].reps.toString());
+    setWeight(mockExercise.setDetails[index].weight.replace(' lbs', ''));
+    setShowSetEdit(true);
+  };
+
+  const handleSave = () => {
+    // Here you would update the set details in state or backend
+    setShowSetEdit(false);
+  };
+
+  const handleCancel = () => {
+    setShowSetEdit(false);
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>  
@@ -38,7 +58,7 @@ export default function EditWorkout() {
               <Text style={styles.setTitle}>{`Set ${i + 1}`}</Text>
               <Text style={styles.setMeta}>{`${set.reps} reps · ${set.weight}`}</Text>
             </View>
-            <TouchableOpacity style={styles.pencilButton}>
+            <TouchableOpacity style={styles.pencilButton} onPress={() => handlePencilPress(i)}>
               <Pencil size={28} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -49,6 +69,47 @@ export default function EditWorkout() {
           <Text style={styles.saveButtonText}>Save</Text>
         </TouchableOpacity>
       </View>
+      {showSetEdit && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showSetEdit}
+          onRequestClose={handleCancel}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Edit Set</Text>
+              <View style={styles.inputRow}>
+                <TextInput
+                  style={[styles.input, { flex: 1, marginRight: 8 }]}
+                  value={reps}
+                  onChangeText={setReps}
+                  keyboardType="numeric"
+                  placeholder="Reps"
+                  placeholderTextColor="#C7C7CC"
+                  autoFocus
+                />
+                <TextInput
+                  style={[styles.input, { flex: 1, marginLeft: 8 }]}
+                  value={weight}
+                  onChangeText={setWeight}
+                  keyboardType="numeric"
+                  placeholder="Weight (lbs)"
+                  placeholderTextColor="#C7C7CC"
+                />
+              </View>
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.modalButton, styles.saveButton]} onPress={handleSave}>
+                  <Text style={styles.saveButtonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -142,5 +203,56 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '85%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+    color: '#14241C',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    width: '100%',
+  },
+  input: {
+    backgroundColor: '#F5F5F7',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#000',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  cancelButton: {
+    backgroundColor: '#F5F5F7',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#8E8E93',
   },
 }); 
