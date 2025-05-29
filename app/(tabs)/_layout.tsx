@@ -28,7 +28,7 @@ export default function TabLayout() {
           onPress={() => router.push('/(tabs)/workouts')}
         >
           <Dumbbell size={28} color={pathname.startsWith('/(tabs)/workouts') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/workouts') ? 1 : inactiveOpacity} />
-          <Text style={pathname.startsWith('/(tabs)/workouts') ? styles.navLabelActive : styles.navLabel}>Workouts</Text>
+          <Text style={pathname.startsWith('/(tabs)/workouts') ? styles.navLabelActive : styles.navLabel}>Excercises</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={pathname.startsWith('/(tabs)/progress') ? styles.navItemActive : styles.navItem}

@@ -3,47 +3,32 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
-const todaysWorkouts = [
+const workouts = [
   {
     id: 1,
+    day: 'sunday',
     name: 'Strength Training',
     reps: 12,
     image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
   {
     id: 2,
+    day: 'monday',
     name: 'Strength Training',
     reps: 10,
     image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
   {
     id: 3,
+    day: 'sunday',
     name: 'Strength Training',
     reps: 15,
     image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
   },
 ];
 
-const yesterdaysWorkouts = [
-  {
-    id: 4,
-    name: 'Strength Training',
-    reps: 12,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-  {
-    id: 5,
-    name: 'Strength Training',
-    reps: 10,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-  {
-    id: 6,
-    name: 'Strength Training',
-    reps: 15,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-];
+const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
 
 export default function HomeScreen() {
   return (
@@ -58,29 +43,26 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <Text style={styles.sectionHeader}>Today's Workouts</Text>
-        <View style={styles.workoutGrid}>
-            {/* style={styles.workoutRow}
-            onPress={() => router.push(`/workouts/details?id=${item.id}` as any)}
-            */}
-          {todaysWorkouts.map((w) => (
+        
+        {days.map((day)=>(
+          <>
+          <Text style={styles.sectionHeader}>{day}'s Workouts</Text>
+          <View style={styles.workoutGrid}>
+            {workouts.filter((workout)=> {
+            return workout.day === 'sunday'  
+            }).map((w) => (
             <TouchableOpacity onPress={()=>{router.push(`/workouts/details?id=${w.id}` as any)}} key={w.id} style={styles.workoutCard}>
               <Image source={{ uri: w.image }} style={styles.workoutImage} />
-              <Text style={styles.workoutName}>{w.name}</Text>
-              <Text style={styles.workoutReps}>{w.reps} reps</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <Text style={styles.sectionHeader}>Tomorrow's Workouts</Text>
-        <View style={styles.workoutGrid}>
-          {yesterdaysWorkouts.map((w) => (
-            <TouchableOpacity onPress={()=>{router.push(`/workouts/details?id=${w.id}` as any)}} key={w.id} style={styles.workoutCard}>
-              <Image source={{ uri: w.image }} style={styles.workoutImage} />
-              <Text style={styles.workoutName}>{w.name}</Text>
-              <Text style={styles.workoutReps}>{w.reps} reps</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+                <Text style={styles.workoutName}>{w.name}</Text>
+                <Text style={styles.workoutReps}>{w.reps} reps</Text>
+              </TouchableOpacity>
+            ))}    
+          </View> 
+          </> 
+        ))}
+
+        
+
       </ScrollView>     
     </SafeAreaView>
   );

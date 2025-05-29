@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Pencil } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { Picker } from '@react-native-picker/picker';
 
 const mockExercise = {
   name: 'Bench Press',
@@ -22,6 +23,7 @@ export default function EditWorkout() {
   const [editSetIndex, setEditSetIndex] = useState<number | null>(null);
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
+  const [selectedDay, setSelectedDay] = useState('Monday');
 
   const handlePencilPress = (index: number) => {
     setEditSetIndex(index);
@@ -48,6 +50,23 @@ export default function EditWorkout() {
         <Text style={styles.title}>Edit Workout</Text>
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: 120 }}>
+        <Text style={styles.sectionTitle}>Day of the Week</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedDay}
+            onValueChange={(itemValue: string) => setSelectedDay(itemValue)}
+            style={styles.picker}
+            dropdownIconColor="#fff"
+          >
+            <Picker.Item label="Sunday" value="Sunday" />
+            <Picker.Item label="Monday" value="Monday" />
+            <Picker.Item label="Tuesday" value="Tuesday" />
+            <Picker.Item label="Wednesday" value="Wednesday" />
+            <Picker.Item label="Thursday" value="Thursday" />
+            <Picker.Item label="Friday" value="Friday" />
+            <Picker.Item label="Saturday" value="Saturday" />
+          </Picker>
+        </View>
         <Text style={styles.sectionTitle}>Exercise</Text>
         <Text style={styles.exerciseName}>{mockExercise.name}</Text>
         <Text style={styles.exerciseMeta}>{`${mockExercise.sets} sets · ${mockExercise.reps} reps · ${mockExercise.weight}`}</Text>
@@ -254,5 +273,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#8E8E93',
+  },
+  pickerContainer: {
+    backgroundColor: '#223D33',
+    borderRadius: 12,
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  picker: {
+    color: '#fff',
+    height: 48,
+    width: '100%',
   },
 }); 

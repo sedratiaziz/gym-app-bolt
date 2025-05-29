@@ -3,12 +3,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { X, Plus } from 'lucide-react-native';
 import { useState } from 'react';
+import { Picker } from '@react-native-picker/picker';
 
 export default function CreateWorkoutScreen() {
   const router = useRouter();
   const [workoutName, setWorkoutName] = useState('');
   const [exercises, setExercises] = useState<any[]>([]);
   const [showExerciseForm, setShowExerciseForm] = useState(false);
+  const [selectedDay, setSelectedDay] = useState('Monday');
 
   const handleAddExercise = (exercise: any) => {
     setExercises([...exercises, exercise]);
@@ -29,6 +31,23 @@ export default function CreateWorkoutScreen() {
         <View style={{ width: 32 }} />
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={{ flexGrow: 1 }}>
+        <Text style={styles.label}>Day of the Week</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedDay}
+            onValueChange={(itemValue: string) => setSelectedDay(itemValue)}
+            style={styles.picker}
+            dropdownIconColor="#fff"
+          >
+            <Picker.Item label="Sunday" value="Sunday" />
+            <Picker.Item label="Monday" value="Monday" />
+            <Picker.Item label="Tuesday" value="Tuesday" />
+            <Picker.Item label="Wednesday" value="Wednesday" />
+            <Picker.Item label="Thursday" value="Thursday" />
+            <Picker.Item label="Friday" value="Friday" />
+            <Picker.Item label="Saturday" value="Saturday" />
+          </Picker>
+        </View>
         <Text style={styles.label}>Workout Name</Text>
         <TextInput
           style={styles.input}
@@ -125,5 +144,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 22,
     fontWeight: '700',
+  },
+  pickerContainer: {
+    backgroundColor: '#223D33',
+    borderRadius: 12,
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  picker: {
+    color: '#fff',
+    height: 48,
+    width: '100%',
   },
 });

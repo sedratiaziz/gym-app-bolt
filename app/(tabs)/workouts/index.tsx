@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Plus } from 'lucide-react-native';
-import { useWorkoutHistory } from '@/hooks/useWorkoutHistory';
 
 // Define Workout type
 interface Workout {
@@ -13,22 +12,8 @@ interface Workout {
 
 export default function WorkoutsScreen() {
   const router = useRouter();
-  const { getAllWorkouts } = useWorkoutHistory();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
 
-  useEffect(() => {
-    const data = getAllWorkouts();
-    if (data && data.length > 0) {
-      setWorkouts(data);
-    } else {
-      setWorkouts([
-        { id: 1, name: 'Full Body Workout' },
-        { id: 2, name: 'Leg Day' },
-        { id: 3, name: 'Upper Body Blast' },
-        { id: 4, name: 'Cardio & Core' },
-      ]);
-    }
-  }, []);
 
   const renderWorkoutItem = ({ item }: { item: Workout }) => (
     <View style={styles.workoutRow}>
@@ -45,7 +30,7 @@ export default function WorkoutsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>  
       <View style={styles.header}>
-        <Text style={styles.title}>Workouts</Text>
+        <Text style={styles.title}>Excercises</Text>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => router.push('/workouts/create')}
