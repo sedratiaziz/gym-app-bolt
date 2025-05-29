@@ -57,7 +57,7 @@ export default function Details() {
         ))}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <TouchableOpacity onPress={()=>{router.push(`/(tabs)/workouts/edit` as any)}} style={styles.editButton}>
+        <TouchableOpacity onPress={() => router.push(`/(tabs)/workouts/${params.id}/edit` as any)} style={styles.editButton}>
           <Text style={styles.buttonText}>Edit Workout</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.startButton}>
