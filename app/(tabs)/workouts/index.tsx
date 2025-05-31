@@ -38,12 +38,18 @@ export default function WorkoutsScreen() {
           <Plus size={32} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={workouts}
-        renderItem={renderWorkoutItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.workoutList}
-      />
+      {workouts.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No workouts added yet.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={workouts}
+          renderItem={renderWorkoutItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.workoutList}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -105,5 +111,17 @@ const styles = StyleSheet.create({
     color: '#F8F8F8',
     fontSize: 22,
     fontWeight: '400',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 60,
+  },
+  emptyText: {
+    color: '#A3C1B4',
+    fontSize: 20,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter, usePathname, Slot } from 'expo-router';
-import { Home, Dumbbell, LineChart, User } from 'lucide-react-native';
+import { Home, Dumbbell, LineChart, User, GlassWater } from 'lucide-react-native';
 
 export default function TabLayout() {
   const router = useRouter();
@@ -20,15 +20,15 @@ export default function TabLayout() {
           style={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? styles.navItemActive : styles.navItem}
           onPress={() => router.push('/(tabs)')}
         >
-          <Home size={28} color={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? activeColor : inactiveColor} opacity={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? 1 : inactiveOpacity} />
-          <Text style={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? styles.navLabelActive : styles.navLabel}>Home</Text>
+          <Dumbbell size={28} color={pathname.startsWith('/(tabs)/workouts') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/workouts') ? 1 : inactiveOpacity} />
+          <Text style={pathname === '/(tabs)' || pathname === '/(tabs)/index' ? styles.navLabelActive : styles.navLabel}>Workouts</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={pathname.startsWith('/(tabs)/workouts') ? styles.navItemActive : styles.navItem}
-          onPress={() => router.push('/(tabs)/workouts')}
+          style={pathname.startsWith('/(tabs)/food') ? styles.navItemActive : styles.navItem}
+          onPress={() => router.push('/(tabs)/Food')}
         >
-          <Dumbbell size={28} color={pathname.startsWith('/(tabs)/workouts') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/workouts') ? 1 : inactiveOpacity} />
-          <Text style={pathname.startsWith('/(tabs)/workouts') ? styles.navLabelActive : styles.navLabel}>Excercises</Text>
+          <GlassWater size={28} color={pathname.startsWith('/(tabs)/food') ? activeColor : inactiveColor} opacity={pathname.startsWith('/(tabs)/food') ? 1 : inactiveOpacity} />
+          <Text style={pathname.startsWith('/(tabs)/food') ? styles.navLabelActive : styles.navLabel}>Food</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={pathname.startsWith('/(tabs)/progress') ? styles.navItemActive : styles.navItem}

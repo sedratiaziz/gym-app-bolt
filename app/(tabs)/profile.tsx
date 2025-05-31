@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Settings, User, Bell, HelpCircle } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>  
       <View style={styles.header}>
@@ -55,6 +58,19 @@ export default function ProfileScreen() {
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#6FCF97',
+          borderRadius: 24,
+          paddingVertical: 16,
+          alignItems: 'center',
+          margin: 24,
+        }}
+        onPress={() => router.push('/(tabs)/test-auth')}
+      >
+        <Text style={{ color: '#12221C', fontSize: 18, fontWeight: '700' }}>Test Auth Navigation</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

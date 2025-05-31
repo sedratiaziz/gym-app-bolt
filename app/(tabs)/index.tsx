@@ -1,31 +1,17 @@
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
-const workouts = [
-  {
-    id: 1,
-    day: 'sunday',
-    name: 'Strength Training',
-    reps: 12,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-  {
-    id: 2,
-    day: 'monday',
-    name: 'Strength Training',
-    reps: 10,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-  {
-    id: 3,
-    day: 'sunday',
-    name: 'Strength Training',
-    reps: 15,
-    image: 'https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg',
-  },
-];
+interface Workout {
+  id: number;
+  day: string;
+  name: string;
+  reps: number;
+  image: string;
+}
+const workouts: Workout[] = [];
 
 const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -43,27 +29,27 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        
-        {days.map((day)=>(
+        {days.map((day) => (
           <>
-          <Text style={styles.sectionHeader}>{day}'s Workouts</Text>
-          <View style={styles.workoutGrid}>
-            {workouts.filter((workout)=> {
-            return workout.day === 'sunday'  
-            }).map((w) => (
-            <TouchableOpacity onPress={()=>{router.push(`/workouts/details?id=${w.id}` as any)}} key={w.id} style={styles.workoutCard}>
-              <Image source={{ uri: w.image }} style={styles.workoutImage} />
-                <Text style={styles.workoutName}>{w.name}</Text>
-                <Text style={styles.workoutReps}>{w.reps} reps</Text>
-              </TouchableOpacity>
-            ))}    
-          </View> 
-          </> 
+            <Text style={styles.sectionHeader}>{day}'s Workouts</Text>
+            {workouts.filter((workout) => workout.day === day).length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No workouts added yet.</Text>
+              </View>
+            ) : (
+              <View style={styles.workoutGrid}>
+                {workouts.filter((workout) => workout.day === day).map((w) => (
+                  <TouchableOpacity onPress={() => { router.push(`/workouts/details?id=${w.id}` as any) }} key={w.id} style={styles.workoutCard}>
+                    <Image source={{ uri: w.image }} style={styles.workoutImage} />
+                    <Text style={styles.workoutName}>{w.name}</Text>
+                    <Text style={styles.workoutReps}>{w.reps} reps</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </>
         ))}
-
-        
-
-      </ScrollView>     
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -188,5 +174,17 @@ const styles = StyleSheet.create({
     color: '#6FCF97',
     fontSize: 13,
     fontWeight: '700',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    minHeight: 60,
+  },
+  emptyText: {
+    color: '#A3C1B4',
+    fontSize: 18,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
