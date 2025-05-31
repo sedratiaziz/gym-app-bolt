@@ -1,45 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { X, Pencil } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
-
-const mockExercise = {
-  name: 'Bench Press',
-  sets: 3,
-  reps: 10,
-  weight: '135 lbs',
-  setDetails: [
-    { reps: 10, weight: '135 lbs' },
-    { reps: 10, weight: '135 lbs' },
-    { reps: 10, weight: '135 lbs' },
-  ],
-};
+import { WorkoutsContext } from '../../_layout';
 
 export default function EditWorkout() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const { workouts } = useContext(WorkoutsContext);
+  const workout = workouts.find((w: { id: number }) => w.id.toString() === params.id);
+
   const [showSetEdit, setShowSetEdit] = useState(false);
   const [editSetIndex, setEditSetIndex] = useState<number | null>(null);
   const [reps, setReps] = useState('');
   const [weight, setWeight] = useState('');
-  const [selectedDay, setSelectedDay] = useState('Monday');
+  const [selectedDay, setSelectedDay] = useState(workout ? (workout.day.charAt(0).toUpperCase() + workout.day.slice(1)) : 'Monday');
 
   const handlePencilPress = (index: number) => {
     setEditSetIndex(index);
-    setReps(mockExercise.setDetails[index].reps.toString());
-    setWeight(mockExercise.setDetails[index].weight.replace(' lbs', ''));
     setShowSetEdit(true);
   };
 
   const handleSave = () => {
-    // Here you would update the set details in state or backend
     setShowSetEdit(false);
   };
 
   const handleCancel = () => {
     setShowSetEdit(false);
   };
+
+  if (!workout) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.push(`/(tabs)`)} style={styles.closeButton}>
+            <X size={36} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Edit Workout</Text>
+        </View>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 20 }}>Workout not found.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>  
@@ -67,21 +73,13 @@ export default function EditWorkout() {
             <Picker.Item label="Saturday" value="Saturday" />
           </Picker>
         </View>
-        <Text style={styles.sectionTitle}>Exercise</Text>
-        <Text style={styles.exerciseName}>{mockExercise.name}</Text>
-        <Text style={styles.exerciseMeta}>{`${mockExercise.sets} sets · ${mockExercise.reps} reps · ${mockExercise.weight}`}</Text>
+        <Text style={styles.sectionTitle}>Workout Name</Text>
+        <Text style={styles.exerciseName}>{workout.name}</Text>
+        <Text style={styles.exerciseMeta}>{`Reps: ${workout.reps}`}</Text>
         <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Sets</Text>
-        {mockExercise.setDetails.map((set, i) => (
-          <View key={i} style={styles.setRow}>
-            <View>
-              <Text style={styles.setTitle}>{`Set ${i + 1}`}</Text>
-              <Text style={styles.setMeta}>{`${set.reps} reps · ${set.weight}`}</Text>
-            </View>
-            <TouchableOpacity style={styles.pencilButton} onPress={() => handlePencilPress(i)}>
-              <Pencil size={28} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        ))}
+        <View style={styles.setRow}>
+          <Text style={styles.setTitle}>No set details available.</Text>
+        </View>
       </ScrollView>
       <View style={styles.saveButtonContainer}>
         <TouchableOpacity style={styles.saveButton}>
@@ -95,36 +93,34 @@ export default function EditWorkout() {
           visible={showSetEdit}
           onRequestClose={handleCancel}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Edit Set</Text>
-              <View style={styles.inputRow}>
-                <TextInput
-                  style={[styles.input, { flex: 1, marginRight: 8 }]}
-                  value={reps}
-                  onChangeText={setReps}
-                  keyboardType="numeric"
-                  placeholder="Reps"
-                  placeholderTextColor="#C7C7CC"
-                  autoFocus
-                />
-                <TextInput
-                  style={[styles.input, { flex: 1, marginLeft: 8 }]}
-                  value={weight}
-                  onChangeText={setWeight}
-                  keyboardType="numeric"
-                  placeholder="Weight (lbs)"
-                  placeholderTextColor="#C7C7CC"
-                />
-              </View>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, styles.saveButton]} onPress={handleSave}>
-                  <Text style={styles.saveButtonText}>Save</Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Edit Set</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={[styles.input, { flex: 1, marginRight: 8 }]}
+                value={reps}
+                onChangeText={setReps}
+                keyboardType="numeric"
+                placeholder="Reps"
+                placeholderTextColor="#C7C7CC"
+                autoFocus
+              />
+              <TextInput
+                style={[styles.input, { flex: 1, marginLeft: 8 }]}
+                value={weight}
+                onChangeText={setWeight}
+                keyboardType="numeric"
+                placeholder="Weight (lbs)"
+                placeholderTextColor="#C7C7CC"
+              />
+            </View>
+            <View style={styles.buttonRow}>
+              <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={handleCancel}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalButton, styles.saveButton]} onPress={handleSave}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>

@@ -1,22 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Plus } from 'lucide-react-native';
+import { Plus, HelpCircle } from 'lucide-react-native';
 import { router } from 'expo-router';
-
-interface Workout {
-  id: number;
-  day: string;
-  name: string;
-  reps: number;
-  image: string;
-}
-const workouts: Workout[] = [];
+import { WorkoutsContext } from './_layout';
 
 const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-
 export default function HomeScreen() {
+  const { workouts } = useContext(WorkoutsContext);
+  // Check if there are any workouts for any day
+  const hasAnyWorkouts = days.some(day => workouts.some(workout => workout.day === day));
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.topBar}>
@@ -29,26 +23,29 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {days.map((day) => (
-          <>
-            <Text style={styles.sectionHeader}>{day}'s Workouts</Text>
-            {workouts.filter((workout) => workout.day === day).length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No workouts added yet.</Text>
-              </View>
-            ) : (
-              <View style={styles.workoutGrid}>
-                {workouts.filter((workout) => workout.day === day).map((w) => (
-                  <TouchableOpacity onPress={() => { router.push(`/workouts/details?id=${w.id}` as any) }} key={w.id} style={styles.workoutCard}>
-                    <Image source={{ uri: w.image }} style={styles.workoutImage} />
-                    <Text style={styles.workoutName}>{w.name}</Text>
-                    <Text style={styles.workoutReps}>{w.reps} reps</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </>
-        ))}
+        {hasAnyWorkouts ? (
+          days.map((day) => (
+            <>
+              <Text style={styles.sectionHeader}>{day}'s Workouts</Text>
+              {workouts.filter((workout) => workout.day === day).length > 0 && (
+                <View style={styles.workoutGrid}>
+                  {workouts.filter((workout) => workout.day === day).map((w) => (
+                    <TouchableOpacity onPress={() => { router.push(`/workouts/details?id=${w.id}` as any) }} key={w.id} style={styles.workoutCard}>
+                      <Image source={{ uri: w.image }} style={styles.workoutImage} />
+                      <Text style={styles.workoutName}>{w.name}</Text>
+                      {/* <Text style={styles.workoutReps}>{w.reps} reps</Text> */}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </>
+          ))
+        ) : (
+          <View style={styles.emptyContainer}>
+            <HelpCircle size={44} color="#A3C1B4" style={{ marginBottom: 12 }} />
+            <Text style={styles.emptyText}>Nothing here!{"\n"}Add some workouts and hit the gym.</Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
