@@ -3,13 +3,21 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter, usePathname, Slot } from 'expo-router';
 import { Home, Dumbbell, LineChart, User, GlassWater, Search, Plus, Compass } from 'lucide-react-native';
 
+// Define the Exercise type
+interface Exercise {
+  id?: number;
+  name: string;
+  weights: number[];
+}
+
 // Define the Workout type
 export interface Workout {
   id: number;
-  day: string;
   name: string;
+  day: string;
   reps: number;
   image: string;
+  exercises: Exercise[];
 }
 
 // Create context

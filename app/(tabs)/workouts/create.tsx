@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { X, Plus, Trash, Pen } from 'lucide-react-native';
+import { X, Plus, Trash, Pen, Trash2 } from 'lucide-react-native';
 import { useState, useContext } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { exerciseDatabase } from '@/utils/exerciseDatabase';
@@ -21,6 +21,8 @@ export default function CreateWorkoutScreen() {
   const [customExerciseInputs, setCustomExerciseInputs] = useState<Record<string, string>>({});
   const [showCustomInputFor, setShowCustomInputFor] = useState<string | null>(null);
   const [removedExercises, setRemovedExercises] = useState<Record<string, string[]>>({});
+  const [selectedExerciseSets, setSelectedExerciseSets] = useState<Record<string, number>>({});
+  const [selectedExerciseWeights, setSelectedExerciseWeights] = useState<Record<string, number[]>>({});
 
   // Group exercises by category
   const groupedExercises = exerciseDatabase.reduce((acc, exercise) => {
@@ -58,15 +60,62 @@ export default function CreateWorkoutScreen() {
       ...prev,
       [exercise.name]: !prev[exercise.name],
     }));
+    // If selecting, initialize sets and weight to 0 if not set
+    setSelectedExerciseSets((prev) => {
+      if (!selectedExercises[exercise.name]) {
+        return { ...prev, [exercise.name]: prev[exercise.name] || 0 };
+      } else {
+        const { [exercise.name]: _, ...rest } = prev;
+        return rest;
+      }
+    });
+    setSelectedExerciseWeights((prev) => {
+      if (!selectedExercises[exercise.name]) {
+        return { ...prev, [exercise.name]: prev[exercise.name] || [0] };
+      } else {
+        const { [exercise.name]: _, ...rest } = prev;
+        return rest;
+      }
+    });
+  };
+
+  const handleSetInputChange = (exerciseName: string, value: string) => {
+    const num = value === '' ? 0 : parseInt(value);
+    setSelectedExerciseSets((prev) => {
+      const newSets = { ...prev, [exerciseName]: num };
+      // Update weights array when sets change
+      setSelectedExerciseWeights((weights) => {
+        const currentWeights = weights[exerciseName] || [0];
+        const newWeights = Array(num).fill(0).map((_, i) => currentWeights[i] || 0);
+        return { ...weights, [exerciseName]: newWeights };
+      });
+      return newSets;
+    });
+  };
+
+  const handleWeightInputChange = (exerciseName: string, setIndex: number, value: string) => {
+    const num = value === '' ? 0 : parseInt(value);
+    setSelectedExerciseWeights((prev) => {
+      const currentWeights = prev[exerciseName] || [];
+      const newWeights = [...currentWeights];
+      newWeights[setIndex] = num;
+      return { ...prev, [exerciseName]: newWeights };
+    });
   };
 
   const handleAddSelectedExercises = () => {
     // Gather all exercises (built-in and custom) from the modal
     const allExercises = Object.values(allGroupedExercises).flat();
-    const toAdd = allExercises.filter(e => selectedExercises[e.name]);
+    const toAdd = allExercises.filter(e => selectedExercises[e.name]).map(e => ({
+      ...e,
+      sets: selectedExerciseSets[e.name] || 1,
+      weights: selectedExerciseWeights[e.name] || [0],
+    }));
     setExercises([...exercises, ...toAdd]);
     setShowExerciseMenu(false);
     setSelectedExercises({});
+    setSelectedExerciseSets({});
+    setSelectedExerciseWeights({});
   };
 
   const handleRemoveExercise = (idxToRemove: number) => {
@@ -147,12 +196,33 @@ export default function CreateWorkoutScreen() {
         {/* List of selected exercises */}
         {exercises.length > 0 && (
           <View style={styles.selectedExercisesList}>
-            {exercises.map((exercise, idx) => (
-              <View key={exercise.name + idx} style={styles.selectedExerciseRow}>
-                <Text style={styles.selectedExerciseName}>{exercise.name}</Text>
-                <TouchableOpacity onPress={() => handleRemoveExercise(idx)} style={styles.trashButton}>
-                  <Trash size={20} color="#FF4545" />
-                </TouchableOpacity>
+            {exercises.map((exercise, index) => (
+              <View key={index} style={styles.exerciseContainer}>
+                <View style={styles.exerciseHeader}>
+                  <Text style={styles.exerciseTitle}>{exercise.name}</Text>
+                  <TouchableOpacity 
+                    onPress={() => handleRemoveExercise(index)}
+                    style={styles.trashButton}
+                  >
+                    <Trash2 size={20} color="#FF6B6B" />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.setsContainer}>
+                  {Array.isArray(exercise.weights) ? (
+                    exercise.weights.map((weight: number, setIndex: number) => (
+                      <View key={setIndex} style={styles.setRow}>
+                        <View style={styles.setNumberContainer}>
+                          <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                        </View>
+                        <View style={styles.setDetails}>
+                          <Text style={styles.setWeight}>{weight ? `${weight} kg` : 'No weight'}</Text>
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={styles.setNumber}>No sets recorded</Text>
+                  )}
+                </View>
               </View>
             ))}
           </View>
@@ -192,21 +262,60 @@ export default function CreateWorkoutScreen() {
                       .filter((exercise: any) => !(removedExercises[category]?.includes(exercise.name)))
                       .map((exercise: any) => (
                         <View key={exercise.name} style={styles.checkboxRow}>
-                          <TouchableOpacity
-                            onPress={() => handleToggleExercise(exercise)}
-                            activeOpacity={0.7}
-                            style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-                          >
-                            <View style={styles.checkbox}>
-                              {selectedExercises[exercise.name] && <View style={styles.checkboxChecked} />}
-                            </View>
-                            <Text style={styles.exerciseName}>{exercise.name}</Text>
-                          </TouchableOpacity>
-                          {/* Show trash bin for all exercises in editing mode only */}
-                          {showCustomInputFor === category && (
-                            <TouchableOpacity onPress={() => handleRemoveCustomExercise(category, exercise.name)} style={styles.trashButton}>
-                              <Trash size={18} color="#FF4545" />
+                          <View style={styles.exerciseMainRow}>
+                            <TouchableOpacity
+                              onPress={() => handleToggleExercise(exercise)}
+                              activeOpacity={0.7}
+                              style={styles.exerciseTouchable}
+                            >
+                              <View style={styles.checkbox}>
+                                {selectedExercises[exercise.name] && <View style={styles.checkboxChecked} />}
+                              </View>
+                              <Text style={styles.exerciseName}>{exercise.name}</Text>
                             </TouchableOpacity>
+                            {showCustomInputFor === category && (
+                              <TouchableOpacity onPress={() => handleRemoveCustomExercise(category, exercise.name)} style={styles.trashButton}>
+                                <Trash size={18} color="#FF4545" />
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                          {/* Set input, only visible if selected */}
+                          {selectedExercises[exercise.name] && (
+                            <View style={styles.inputsContainer}>
+                              <View style={styles.setInputContainer}>
+                                <Text style={styles.inputLabel}>Sets</Text>
+                                <TextInput
+                                  style={styles.setInput}
+                                  keyboardType="number-pad"
+                                  value={selectedExerciseSets[exercise.name] ? selectedExerciseSets[exercise.name].toString() : ''}
+                                  onChangeText={value => handleSetInputChange(exercise.name, value)}
+                                  placeholder="Sets"
+                                  placeholderTextColor="#A3C1B4"
+                                  maxLength={3}
+                                />
+                              </View>
+                              {selectedExerciseSets[exercise.name] > 0 && (
+                                <View style={styles.weightsContainer}>
+                                  <Text style={styles.weightsLabel}>Weights:</Text>
+                                  <View style={styles.weightsInputsRow}>
+                                    {Array.from({ length: selectedExerciseSets[exercise.name] }).map((_, index) => (
+                                      <View key={index} style={styles.weightInputWrapper}>
+                                        <Text style={styles.setNumberLabel}>Set {index + 1}</Text>
+                                        <TextInput
+                                          style={styles.weightInput}
+                                          keyboardType="number-pad"
+                                          value={selectedExerciseWeights[exercise.name]?.[index]?.toString() || ''}
+                                          onChangeText={value => handleWeightInputChange(exercise.name, index, value)}
+                                          placeholder="Weight"
+                                          placeholderTextColor="#A3C1B4"
+                                          maxLength={4}
+                                        />
+                                      </View>
+                                    ))}
+                                  </View>
+                                </View>
+                              )}
+                            </View>
                           )}
                         </View>
                       ))}
@@ -364,9 +473,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
   },
   checkbox: {
     width: 22,
@@ -420,24 +527,102 @@ const styles = StyleSheet.create({
   selectedExercisesList: {
     marginBottom: 20,
   },
-  selectedExerciseRow: {
+  exerciseContainer: {
+    marginBottom: 24,
+  },
+  exerciseHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#223D33',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  selectedExerciseName: {
+  exerciseTitle: {
+    fontSize: 26,
+    fontWeight: '700',
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '500',
+    marginTop: 8,
+    flex: 1,
   },
   trashButton: {
-    marginLeft: 'auto',
-    paddingLeft: 12,
-    paddingVertical: 2,
+    padding: 8,
+    marginLeft: 12,
+  },
+  setsContainer: {
+    marginTop: 12,
+    backgroundColor: '#223D33',
+    borderRadius: 12,
+    padding: 12,
+  },
+  setRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A4A3D',
+  },
+  setNumberContainer: {
+    width: 80,
+  },
+  setNumber: {
+    fontSize: 16,
+    color: '#6FCF97',
+    fontWeight: '500',
+  },
+  setDetails: {
+    flex: 1,
+  },
+  setWeight: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: '400',
+  },
+  inputLabel: {
+    fontSize: 15,
+    color: '#14241C',
+    marginRight: 4,
+    fontWeight: '500',
+    alignSelf: 'center',
+  },
+  setInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  weightsContainer: {
+    marginTop: 4,
+  },
+  weightsLabel: {
+    fontSize: 15,
+    color: '#14241C',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  weightsInputsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  weightInputWrapper: {
+    alignItems: 'center',
+  },
+  setInput: {
+    width: 48,
+    height: 32,
+    backgroundColor: '#F5F5F7',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    fontSize: 15,
+    color: '#14241C',
+  },
+  exerciseMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  exerciseTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   customExerciseRow: {
     flexDirection: 'row',
@@ -476,5 +661,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',
+  },
+  inputsContainer: {
+    marginLeft: 34,
+    marginTop: 8,
+  },
+  setNumberLabel: {
+    fontSize: 13,
+    color: '#14241C',
+    marginBottom: 2,
+  },
+  weightInput: {
+    width: 60,
+    height: 32,
+    backgroundColor: '#F5F5F7',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    fontSize: 15,
+    color: '#14241C',
   },
 });

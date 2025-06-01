@@ -37,23 +37,22 @@ export default function Details() {
           workout.exercises.map((exercise: any, i: number) => (
             <View key={i} style={{ marginBottom: 24 }}>
               <Text style={styles.exerciseTitle}>{`Exercise ${i + 1}: ${exercise.name}`}</Text>
-              {Array.isArray(exercise.sets) && exercise.sets.length > 0 ? (
-                exercise.sets.map((set: any, j: number) => (
-                  <View key={j} style={styles.setRow}>
-                    {set.image ? (
-                      <Image source={{ uri: set.image }} style={styles.setImage} />
-                    ) : (
-                      <View style={[styles.setImage, { backgroundColor: '#223D33' }]} />
-                    )}
-                    <View>
-                      <Text style={styles.setWeight}>{set.weight ? `Weight: ${set.weight}` : ''}</Text>
-                      <Text style={styles.setNumber}>{set.set ? `Set ${set.set}` : ''}</Text>
+              <View style={styles.setsContainer}>
+                {Array.isArray(exercise.weights) ? (
+                  exercise.weights.map((weight: number, setIndex: number) => (
+                    <View key={setIndex} style={styles.setRow}>
+                      <View style={styles.setNumberContainer}>
+                        <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                      </View>
+                      <View style={styles.setDetails}>
+                        <Text style={styles.setWeight}>{weight ? `${weight} kg` : 'No weight'}</Text>
+                      </View>
                     </View>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.setNumber}>No sets</Text>
-              )}
+                  ))
+                ) : (
+                  <Text style={styles.setNumber}>No sets recorded</Text>
+                )}
+              </View>
             </View>
           ))
         ) : (
@@ -109,28 +108,34 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: 8,
   },
+  setsContainer: {
+    marginTop: 12,
+    backgroundColor: '#223D33',
+    borderRadius: 12,
+    padding: 12,
+  },
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#2A4A3D',
   },
-  setImage: {
-    width: 72,
-    height: 72,
-    borderRadius: 16,
-    marginRight: 18,
-    backgroundColor: '#223D33',
-  },
-  setWeight: {
-    fontSize: 22,
-    color: '#fff',
-    fontWeight: '400',
+  setNumberContainer: {
+    width: 80,
   },
   setNumber: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#6FCF97',
+    fontWeight: '500',
+  },
+  setDetails: {
+    flex: 1,
+  },
+  setWeight: {
+    fontSize: 18,
+    color: '#fff',
     fontWeight: '400',
-    marginTop: 2,
   },
   buttonRow: {
     position: 'absolute',
