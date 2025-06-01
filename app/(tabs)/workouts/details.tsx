@@ -60,12 +60,13 @@ export default function Details() {
         )}
       </ScrollView>
       <View style={styles.buttonRow}>
-        <TouchableOpacity onPress={() => router.push(`/(tabs)/workouts/${params.id}/edit` as any)} style={styles.editButton}>
-          <Text style={styles.buttonText}>Edit Workout</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.startButton}>
           <Text style={styles.buttonText}>Start Workout</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push(`/(tabs)/workouts/${params.id}/edit` as any)} style={styles.editButton}>
+          <Text style={styles.buttonText}>Edit Workout</Text>
+        </TouchableOpacity>
+        
       </View>
     </SafeAreaView>
   );
@@ -149,18 +150,18 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    backgroundColor: '#1DB87A',
+    backgroundColor: '#223D33',
     borderRadius: 32,
-    marginRight: 12,
+    marginLeft: 12,
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
   startButton: {
     flex: 1,
-    backgroundColor: '#223D33',
+    backgroundColor: '#1DB87A',
     borderRadius: 32,
-    marginLeft: 12,
+    marginRight: 12,
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',

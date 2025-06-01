@@ -104,12 +104,32 @@ export default function CreateWorkoutScreen() {
   };
 
   const handleAddSelectedExercises = () => {
-    // Gather all exercises (built-in and custom) from the modal
+    // Check if all selected exercises have sets and weights
     const allExercises = Object.values(allGroupedExercises).flat();
-    const toAdd = allExercises.filter(e => selectedExercises[e.name]).map(e => ({
+    const selectedExercisesList = allExercises.filter(e => selectedExercises[e.name]);
+    
+    // Validate that all selected exercises have sets and weights
+    const invalidExercises = selectedExercisesList.filter(e => {
+      const sets = selectedExerciseSets[e.name];
+      const weights = selectedExerciseWeights[e.name];
+      return !sets || 
+             sets <= 0 || 
+             !weights || 
+             weights.length === 0 || 
+             weights.some(w => w === undefined || w === null || w === 0);
+    });
+
+    if (invalidExercises.length > 0) {
+      // Show error message
+      alert('Please enter sets and weights (greater than 0) for all selected exercises');
+      return;
+    }
+
+    // Gather all exercises (built-in and custom) from the modal
+    const toAdd = selectedExercisesList.map(e => ({
       ...e,
-      sets: selectedExerciseSets[e.name] || 1,
-      weights: selectedExerciseWeights[e.name] || [0],
+      sets: selectedExerciseSets[e.name],
+      weights: selectedExerciseWeights[e.name],
     }));
     setExercises([...exercises, ...toAdd]);
     setShowExerciseMenu(false);
@@ -138,6 +158,18 @@ export default function CreateWorkoutScreen() {
   };
 
   const handleSaveWorkout = () => {
+    // Validate target muscle
+    if (!workoutName.trim()) {
+      alert('Please enter a target muscle');
+      return;
+    }
+
+    // Validate that there are exercises
+    if (exercises.length === 0) {
+      alert('Please add at least one exercise');
+      return;
+    }
+
     // Create a new workout object
     const newWorkout = {
       id: Date.now(),
@@ -145,7 +177,7 @@ export default function CreateWorkoutScreen() {
       name: workoutName,
       reps: exercises.length > 0 ? exercises[0].reps : 0,
       image: exercises.length > 0 ? (exercises[0].imageUrl || exercises[0].image || 'https://images.pexels.com/photos/136404/pexels-photo-136404.jpeg') : 'https://images.pexels.com/photos/136404/pexels-photo-136404.jpeg',
-      exercises: exercises, // <-- Add this line to include the array of exercises
+      exercises: exercises,
     };
     setWorkouts([...workouts, newWorkout]);
     router.push('/(tabs)');
@@ -180,6 +212,7 @@ export default function CreateWorkoutScreen() {
         </View>
         <Text style={styles.label}>Target Muscle Name</Text>
         <TextInput
+          
           style={styles.input}
           value={workoutName}
           onChangeText={setWorkoutName}

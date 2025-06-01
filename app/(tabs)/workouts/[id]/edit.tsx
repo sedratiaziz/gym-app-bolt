@@ -121,12 +121,31 @@ export default function Edit() {
   };
 
   const handleAddExercises = () => {
-    const newExercises = Object.entries(selectedExercises)
-      .filter(([_, selected]) => selected)
-      .map(([name]) => ({
-        name,
-        weights: selectedExerciseWeights[name] || [0],
-      }));
+    // Check if all selected exercises have sets and weights
+    const allExercises = Object.values(allGroupedExercises).flat();
+    const selectedExercisesList = allExercises.filter(e => selectedExercises[e.name]);
+    
+    // Validate that all selected exercises have sets and weights
+    const invalidExercises = selectedExercisesList.filter(e => {
+      const sets = selectedExerciseSets[e.name];
+      const weights = selectedExerciseWeights[e.name];
+      return !sets || 
+             sets <= 0 || 
+             !weights || 
+             weights.length === 0 || 
+             weights.some(w => w === undefined || w === null || w === 0);
+    });
+
+    if (invalidExercises.length > 0) {
+      // Show error message
+      alert('Please enter sets and weights (greater than 0) for all selected exercises');
+      return;
+    }
+
+    const newExercises = selectedExercisesList.map(e => ({
+      name: e.name,
+      weights: selectedExerciseWeights[e.name],
+    }));
 
     setExercises([...exercises, ...newExercises]);
     setShowExerciseMenu(false);
@@ -150,12 +169,33 @@ export default function Edit() {
 
   const handleSave = () => {
     if (!workout) return;
+
+    // Validate target muscle
+    if (!name.trim()) {
+      alert('Please enter a target muscle');
+      return;
+    }
+
+    // Validate that all exercises have sets and weights
+    const invalidExercises = exercises.filter(e => {
+      const weights = e.weights;
+      return !weights || 
+             weights.length === 0 || 
+             weights.some(w => w === undefined || w === null || w === 0);
+    });
+
+    if (invalidExercises.length > 0) {
+      // Show error message
+      alert('Please enter weights (greater than 0) for all exercises');
+      return;
+    }
     
     // Update the workout with new exercises and day
     const updatedWorkout: Workout = {
       ...workout,
       exercises: exercises,
       day: selectedDay.toLowerCase(),
+      name: name.trim(),
     };
     // Update in context
     const updatedWorkouts = workouts.map(w => w.id === workout.id ? updatedWorkout : w);
@@ -442,9 +482,11 @@ export default function Edit() {
               <TouchableOpacity style={styles.menuCancelButton} onPress={() => setShowExerciseMenu(false)}>
                 <Text style={styles.menuCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuAddButton} onPress={handleAddExercises}>
-                <Text style={styles.menuAddText}>Add Selected</Text>
-              </TouchableOpacity>
+              {Object.keys(selectedExercises).some(key => selectedExercises[key]) && (
+                <TouchableOpacity style={styles.menuAddButton} onPress={handleAddExercises}>
+                  <Text style={styles.menuAddText}>Add Selected</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
