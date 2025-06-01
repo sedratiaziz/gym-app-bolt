@@ -96,6 +96,7 @@ export default function CreateWorkoutScreen() {
       name: workoutName,
       reps: exercises.length > 0 ? exercises[0].reps : 0,
       image: exercises.length > 0 ? (exercises[0].imageUrl || exercises[0].image || 'https://images.pexels.com/photos/136404/pexels-photo-136404.jpeg') : 'https://images.pexels.com/photos/136404/pexels-photo-136404.jpeg',
+      exercises: exercises, // <-- Add this line to include the array of exercises
     };
     setWorkouts([...workouts, newWorkout]);
     router.push('/(tabs)');

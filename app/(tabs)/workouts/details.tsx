@@ -1,36 +1,28 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
-
-const mockData = {
-  name: 'Chest Workout',
-  exercises: [
-    {
-      name: 'Squats',
-      sets: [
-        { image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/squat-2026446_1280.png', weight: '135 lbs', set: 1 },
-        { image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/squat-2026447_1280.png', weight: '135 lbs', set: 2 },
-        { image: 'https://cdn.pixabay.com/photo/2017/01/31/13/14/squat-2026448_1280.png', weight: '135 lbs', set: 3 },
-      ],
-    },
-    {
-      name: 'Bench Press',
-      sets: [
-        { image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg', weight: '185 lbs', set: 1 },
-        { image: 'https://images.pexels.com/photos/2261482/pexels-photo-2261482.jpeg', weight: '185 lbs', set: 2 },
-        { image: 'https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg', weight: '185 lbs', set: 3 },
-      ],
-    },
-  ],
-};
+import { WorkoutsContext } from '../_layout'; // Adjust path if needed
 
 export default function Details() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  // In real app, fetch workout by params.id
-  const workout = mockData;
+  const { workouts } = useContext(WorkoutsContext);
+  const workout = workouts.find((w: any) => w.id.toString() === params.id);
+
+  if (!workout) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ArrowLeft size={32} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Workout Not Found</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>  
@@ -41,20 +33,32 @@ export default function Details() {
         <Text style={styles.title}>{workout.name}</Text>
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: 120 }}>
-        {workout.exercises.map((exercise, i) => (
-          <View key={i} style={{ marginBottom: 24 }}>
-            <Text style={styles.exerciseTitle}>{`Exercise ${i + 1}: ${exercise.name}`}</Text>
-            {exercise.sets.map((set, j) => (
-              <View key={j} style={styles.setRow}>
-                <Image source={{ uri: set.image }} style={styles.setImage} />
-                <View>
-                  <Text style={styles.setWeight}>{`Weight: ${set.weight}`}</Text>
-                  <Text style={styles.setNumber}>{`Set ${set.set}`}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        ))}
+        {Array.isArray(workout.exercises) && workout.exercises.length > 0 ? (
+          workout.exercises.map((exercise: any, i: number) => (
+            <View key={i} style={{ marginBottom: 24 }}>
+              <Text style={styles.exerciseTitle}>{`Exercise ${i + 1}: ${exercise.name}`}</Text>
+              {Array.isArray(exercise.sets) && exercise.sets.length > 0 ? (
+                exercise.sets.map((set: any, j: number) => (
+                  <View key={j} style={styles.setRow}>
+                    {set.image ? (
+                      <Image source={{ uri: set.image }} style={styles.setImage} />
+                    ) : (
+                      <View style={[styles.setImage, { backgroundColor: '#223D33' }]} />
+                    )}
+                    <View>
+                      <Text style={styles.setWeight}>{set.weight ? `Weight: ${set.weight}` : ''}</Text>
+                      <Text style={styles.setNumber}>{set.set ? `Set ${set.set}` : ''}</Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.setNumber}>No sets</Text>
+              )}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.setNumber}>No exercises found.</Text>
+        )}
       </ScrollView>
       <View style={styles.buttonRow}>
         <TouchableOpacity onPress={() => router.push(`/(tabs)/workouts/${params.id}/edit` as any)} style={styles.editButton}>

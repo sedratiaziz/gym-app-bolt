@@ -31,6 +31,8 @@ export default function EditWorkout() {
     setShowSetEdit(false);
   };
 
+  console.log('workout.exercises', workout?.exercises);
+
   if (!workout) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -76,10 +78,20 @@ export default function EditWorkout() {
         <Text style={styles.sectionTitle}>Workout Name</Text>
         <Text style={styles.exerciseName}>{workout.name}</Text>
         <Text style={styles.exerciseMeta}>{`Reps: ${workout.reps}`}</Text>
-        <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Sets</Text>
-        <View style={styles.setRow}>
-          <Text style={styles.setTitle}>No set details available.</Text>
-        </View>
+        <Text style={[styles.sectionTitle, { marginTop: 32 }]}>Exercises</Text>
+        {Array.isArray(workout?.exercises) && workout.exercises.length > 0 ? (
+          workout.exercises.map((exercise: any, idx: number) => (
+            <View key={exercise.id || idx} style={styles.setRow}>
+              <Text style={styles.setTitle}>
+                {exercise.name || exercise.title || JSON.stringify(exercise)}
+              </Text>
+            </View>
+          ))
+        ) : (
+          <View style={styles.setRow}>
+            <Text style={styles.setTitle}>No exercises found for this workout.</Text>
+          </View>
+        )}
       </ScrollView>
       <View style={styles.saveButtonContainer}>
         <TouchableOpacity style={styles.saveButton}>
@@ -281,4 +293,4 @@ const styles = StyleSheet.create({
     height: 48,
     width: '100%',
   },
-}); 
+});
