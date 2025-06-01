@@ -178,17 +178,17 @@ export default function CreateWorkoutScreen() {
             <Picker.Item label="Saturday" value="Saturday" />
           </Picker>
         </View>
-        <Text style={styles.label}>Workout Name</Text>
+        <Text style={styles.label}>Target Muscle Name</Text>
         <TextInput
           style={styles.input}
           value={workoutName}
           onChangeText={setWorkoutName}
-          placeholder="Workout Name"
+          placeholder="Target Muscle Name"
           placeholderTextColor="#A3C1B4"
         />
-        <Text style={styles.label}>Exercises</Text>
+        <Text style={styles.label}>Workouts</Text>
         <View style={styles.exerciseRow}>
-          <Text style={styles.addExerciseText}>Add Exercise</Text>
+          <Text style={styles.addExerciseText}>Add Workouts</Text>
           <TouchableOpacity onPress={() => setShowExerciseMenu(true)}>
             <Plus size={28} color="#E6F2E9" />
           </TouchableOpacity>

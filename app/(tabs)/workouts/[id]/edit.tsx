@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Pencil, ArrowLeft } from 'lucide-react-native';
+import { Pencil, ArrowLeft, Trash2, Plus } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Picker } from '@react-native-picker/picker';
 import { WorkoutsContext, Workout } from '../../_layout';
@@ -68,6 +68,25 @@ export default function Edit() {
     });
   };
 
+  const handleRemoveSet = (exerciseIndex: number, setIndex: number) => {
+    setExercises(prev => {
+      const newExercises = [...prev];
+      newExercises[exerciseIndex].weights.splice(setIndex, 1);
+      return newExercises;
+    });
+  };
+
+  const handleAddSet = (exerciseIndex: number) => {
+    setExercises(prev => {
+      const newExercises = [...prev];
+      if (!newExercises[exerciseIndex].weights) {
+        newExercises[exerciseIndex].weights = [];
+      }
+      newExercises[exerciseIndex].weights.push(0);
+      return newExercises;
+    });
+  };
+
   const handleSave = () => {
     if (!workout) return;
     
@@ -77,8 +96,10 @@ export default function Edit() {
       exercises: exercises,
     };
     // Update in context
-    setWorkouts(workouts.map(w => w.id === workout.id ? updatedWorkout : w));
-    router.push(`/(tabs)/workouts/${workoutId}` as any);
+    const updatedWorkouts = workouts.map(w => w.id === workout.id ? updatedWorkout : w);
+    setWorkouts(updatedWorkouts);
+    // Navigate back to the home page
+    router.push('/(tabs)');
   };
 
   return (
@@ -90,14 +111,15 @@ export default function Edit() {
         <Text style={styles.title}>Edit Workout</Text>
       </View>
       <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: 120 }}>
-        <Text style={styles.sectionTitle}>Workout Details</Text>
+        <Text style={styles.sectionTitle}>Target Muscle</Text>
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
           placeholder="Workout Name"
           placeholderTextColor="#A3C1B4"
-        />        
+        />
+        <Text style={styles.sectionTitle}>Day</Text>        
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedDay}
@@ -127,28 +149,47 @@ export default function Edit() {
               </View>
               <View style={styles.setsContainer}>
                 {Array.isArray(exercise.weights) ? (
-                  exercise.weights.map((weight: number, setIndex: number) => (
-                    <View key={setIndex} style={styles.setRow}>
-                      <View style={styles.setNumberContainer}>
-                        <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                  <>
+                    {exercise.weights.map((weight: number, setIndex: number) => (
+                      <View key={setIndex} style={styles.setRow}>
+                        <View style={styles.setNumberContainer}>
+                          <Text style={styles.setNumber}>Set {setIndex + 1}</Text>
+                        </View>
+                        <View style={styles.setDetails}>
+                          {editingExercise === idx ? (
+                            <View style={styles.setInputRow}>
+                              <TextInput
+                                style={styles.weightInput}
+                                keyboardType="number-pad"
+                                value={weight ? weight.toString() : ''}
+                                onChangeText={(value) => handleSetChange(idx, setIndex, value)}
+                                placeholder="Weight"
+                                placeholderTextColor="#A3C1B4"
+                                maxLength={4}
+                              />
+                              <TouchableOpacity 
+                                onPress={() => handleRemoveSet(idx, setIndex)}
+                                style={styles.trashButton}
+                              >
+                                <Trash2 size={20} color="#FF6B6B" />
+                              </TouchableOpacity>
+                            </View>
+                          ) : (
+                            <Text style={styles.setWeight}>{weight ? `${weight} kg` : 'No weight'}</Text>
+                          )}
+                        </View>
                       </View>
-                      <View style={styles.setDetails}>
-                        {editingExercise === idx ? (
-                          <TextInput
-                            style={styles.weightInput}
-                            keyboardType="number-pad"
-                            value={weight ? weight.toString() : ''}
-                            onChangeText={(value) => handleSetChange(idx, setIndex, value)}
-                            placeholder="Weight"
-                            placeholderTextColor="#A3C1B4"
-                            maxLength={4}
-                          />
-                        ) : (
-                          <Text style={styles.setWeight}>{weight ? `${weight} kg` : 'No weight'}</Text>
-                        )}
-                      </View>
-                    </View>
-                  ))
+                    ))}
+                    {editingExercise === idx && (
+                      <TouchableOpacity 
+                        onPress={() => handleAddSet(idx)}
+                        style={styles.addSetButton}
+                      >
+                        <Plus size={20} color="#16A06A" />
+                        <Text style={styles.addSetText}>Add Set</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
                 ) : (
                   <Text style={styles.setNumber}>No sets recorded</Text>
                 )}
@@ -300,5 +341,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: '700',
+  },
+  setInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  trashButton: {
+    padding: 4,
+  },
+  addSetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#2A4A3D',
+    gap: 8,
+  },
+  addSetText: {
+    color: '#16A06A',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
