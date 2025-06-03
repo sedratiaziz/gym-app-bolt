@@ -1,23 +1,77 @@
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await signIn(email, password);
+      router.push('/(tabs)');
+    } catch (err) {
+      setError('Failed to sign in');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ImageBackground
-        source={require('../../assets/images/space-bg.png')} // Replace with your space/star background
+        source={require('../../assets/images/space-bg.png')}
         style={styles.bg}
         resizeMode="cover"
       >
         <View style={styles.overlay}>
           <Text style={styles.welcome}>Welcome back</Text>
           <Text style={styles.headline}>LOG IN TO YOUR ACCOUNT</Text>
-          <TouchableOpacity style={styles.loginBtn} onPress={() => router.push('/(tabs)/Food')}>
-            <Text style={styles.loginBtnText}>Log in</Text>
+          
+          <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#666"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#666"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          </View>
+
+          <TouchableOpacity 
+            style={[styles.loginBtn, loading && styles.loginBtnDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.loginBtnText}>
+              {loading ? 'Logging in...' : 'Log in'}
+            </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.createBtn} onPress={() => router.push('/(tabs)/Signup')}>
+          
+          <TouchableOpacity 
+            style={styles.createBtn} 
+            onPress={() => router.push('/(tabs)/Signup')}
+          >
             <Text style={styles.createBtnText}>Create account</Text>
           </TouchableOpacity>
         </View>
@@ -61,6 +115,24 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     lineHeight: 38,
   },
+  form: {
+    width: '100%',
+    marginBottom: 24,
+  },
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    color: '#fff',
+    fontSize: 16,
+  },
+  errorText: {
+    color: '#FF4545',
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
   loginBtn: {
     width: '100%',
     backgroundColor: '#18181A',
@@ -68,6 +140,9 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     alignItems: 'center',
     marginBottom: 16,
+  },
+  loginBtnDisabled: {
+    opacity: 0.7,
   },
   loginBtnText: {
     color: '#fff',
@@ -86,4 +161,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
   },
-}); 
+});
