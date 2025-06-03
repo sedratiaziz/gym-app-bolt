@@ -377,9 +377,11 @@ export default function CreateWorkoutScreen() {
                 <TouchableOpacity style={styles.menuCancelButton} onPress={() => setShowExerciseMenu(false)}>
                   <Text style={styles.menuCancelText}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuAddButton} onPress={handleAddSelectedExercises}>
-                  <Text style={styles.menuAddText}>Add Selected</Text>
-                </TouchableOpacity>
+                {Object.values(selectedExercises).some(isSelected => isSelected) && (
+                  <TouchableOpacity style={styles.menuAddButton} onPress={handleAddSelectedExercises}>
+                    <Text style={styles.menuAddText}>Add Selected</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </View>

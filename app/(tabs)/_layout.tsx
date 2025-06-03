@@ -18,6 +18,8 @@ export interface Workout {
   reps: number;
   image: string;
   exercises: Exercise[];
+  date: string;
+  muscleGroups: string[];
 }
 
 // Create context
