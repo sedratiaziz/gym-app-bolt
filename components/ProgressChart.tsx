@@ -1,5 +1,20 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { LineChart as RNLineChart } from 'react-native-chart-kit';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+
+// Placeholder component for web environment
+const LineChart = ({ data, width, height, chartConfig, bezier, style }) => {
+  return (
+    <View style={[{ width, height }, style]}>
+      <View style={styles.placeholderChart}>
+        <Text style={styles.placeholderText}>
+          Chart visualization is only available in mobile environments
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+// Only import the chart library when not on web platform
+const RNLineChart = Platform.OS === 'web' ? LineChart : require('react-native-chart-kit').LineChart;
 
 export function ProgressChart({ data, type, style }) {
   // If there's not enough data, show a placeholder
@@ -45,9 +60,11 @@ export function ProgressChart({ data, type, style }) {
     }
   };
 
+  const ChartComponent = Platform.OS === 'web' ? LineChart : RNLineChart;
+
   return (
     <View style={[styles.container, style]}>
-      <RNLineChart
+      <ChartComponent
         data={chartData}
         width={300}
         height={200}
@@ -58,17 +75,6 @@ export function ProgressChart({ data, type, style }) {
     </View>
   );
 }
-
-// Placeholder component to handle SSR and web environment
-// This is a simplified implementation for the code example
-const LineChart = ({ data, width, height, chartConfig, bezier, style }) => {
-  return (
-    <View style={[{ width, height }, style]}>
-      <Text>Chart would be rendered here in a real mobile environment</Text>
-      {/* In a real implementation, conditionally import the real chart component */}
-    </View>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -86,9 +92,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
   },
   placeholderText: {
     color: '#8E8E93',
     fontWeight: '500',
+    textAlign: 'center',
   }
 });
